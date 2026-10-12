@@ -1,0 +1,7 @@
+See ../symbol-export/code.lisp
+for an example how to advise
+cl:read and cl:load on sbcl so that when an unexported symbol
+is encountered, a restart shows in the debugger which through
+swank can automatically export it.
+
+Note: in Aspect-Oriented Programming (AOP), "advice" is used as a countable noun meaning a specific piece of code that runs at a join point, making "advices" an informally accepted plural in that technical subculture.
