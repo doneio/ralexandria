@@ -1,6 +1,9 @@
 (defpackage #:ralexandria.prog.proj
   (:use)
-  (:export #:new-project))
+  (:export #:new-project
+           #:NAME
+           #:SHORT-NAME
+           #:DEPENDS-ON))
 
 (defpackage #:ralexandria.prog.proj-impl
   (:use :cl)

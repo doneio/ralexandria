@@ -5,8 +5,12 @@
   (set-dispatch-macro-character #\# #\> #'multiline-string:reader))
 
 (defclass project-specification ()
-  ((name :initarg :name :accessor name)
-   (short-name :initarg :short-name :accessor short-name)))
+  ((name :initarg :name :accessor proj:name)
+   (short-name :initarg :short-name :accessor proj:short-name)
+   (depends-on :initarg :depends-on :accessor proj:depends-on :initform (make-depends-on))))
+
+(defun make-depends-on ()
+  '())
 
 (defun dir-from (dir)
   (assert (not (char= #\/ (aref dir (1- (length dir))))))
@@ -20,30 +24,34 @@
 (defgeneric create-dir (type path))
 (defmethod create-dir :around (type path)
   (ensure-directories-exist path)
-  (with-accessors ((name name)
-                   (short-name short-name)) *spec*
+  (with-accessors ((name proj:name)
+                   (short-name proj:short-name)) *spec*
     (let ((*name* name)
           (*short-name* short-name))
       (call-next-method))))
 
 (defmacro with-open-file% ((stream path) &body body)
   `(with-open-file (,stream ,path :direction :output :if-exists :supersede)
-     ,@body))
+     (flet ((wr (object &rest args)
+              (apply #'write object :stream ,stream args)))
+       (declare (ignorable (function wr)))
+       (let ((*print-case* :downcase)
+             (*print-escape* nil))
+         ,@body))))
 
 (defmethod create-dir ((type (eql :proj)) path)
   "Create the files in the project directory"
   (with-open-file% (stream (merge-pathnames (strings:+ *name* ".asd") path))
-    (format stream #>END"
-(in-package #:asdf-user)
-
-(defsystem #:~A
-  :name ""
-  :pathname "src"
-  :depends-on ()
-  :components ((:file "packages")
-               (:file "~A"))
-  :in-order-to ((test-op (test-op "~A-test"))))
-END" *name* *short-name* *name*)))
+    (wr '(in-package #:asdf-user))
+    (terpri stream)(terpri stream)
+    #+TODO(let ((*package* (find-package :asdf-user))))
+    (wr `(defsystem ,(make-symbol (string-upcase *name*))
+           :name ""
+           :pathname "src"
+           :depends-on ()
+           :components ((:file "packages")
+                        (:file ,*short-name*)
+                        :in-order-to ((test-op (test-op ,(strings:+ *name* "-test"))))))))))
 
 (defmethod create-dir ((type (eql :src)) path)
   "Create the files in the src directory"
@@ -88,11 +96,12 @@ END" ; (#:~A-impl #:~A-impl) *short-name* *name*
   (princ "~A: all tests passed.")(terpri))
 END" *name* *name* *name*)))
 
-(defun proj:new-project (path &key name (short-name name))
+(defun proj:new-project (path &rest keys &key name (short-name name) depends-on)
+  (declare (ignorable depends-on))
   (let* ((proj-path (merge-pathnames (dir-from short-name) path))
          (src-path (merge-pathnames "src/" proj-path))
          (test-path (merge-pathnames "test/" proj-path))
-         (*spec* (make-instance 'project-specification :name name :short-name short-name)))
+         (*spec* (apply #'make-instance 'project-specification keys)))
     (create-dir :proj proj-path)
     (create-dir :src src-path)
     (create-dir :test test-path)

@@ -2,18 +2,21 @@
 
 (defun read-forms-from-file (pathname)
   "Reads all Common Lisp forms from PATHNAME and returns them as a list."
-  (with-open-file (stream pathname :direction :input)
-    ;; Create a unique sentinel object to detect EOF reliably
-    (let ((eof-marker (gensym)))
-      (loop :for form = (read stream nil eof-marker)
-            :until (eq form eof-marker)
-            :collect form))))
+  (let ((*package* *package*))
+    (with-open-file (stream pathname :direction :input)
+      ;; Create a unique sentinel object to detect EOF reliably
+      (let ((eof-marker (gensym)))
+        (loop :for form = (read stream nil eof-marker)
+              :until (eq form eof-marker)
+              :when (and (consp form) (eq (car form) 'in-package))
+                :do (eval form)
+              :collect form)))))
 
-
-(defvar *do-once* ; we define this package to avoid errors in the test
+(eval-when (:compile-toplevel :load-toplevel :execute)  
+  (defvar *do-once* ; we define this package to avoid errors in the test
     (cl:defpackage #:tmp.accounting.module1_-test ; when tmp.accounting.module1_-test:do-tests is read
       (:use)
-      (:export #:do-tests)))
+      (:export #:do-tests))))
 
 (defun do-tests ()
   (let* ((name "tmp.accounting.module1_")

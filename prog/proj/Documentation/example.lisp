@@ -12,3 +12,8 @@
  #p"./"
  :name "ralexandria.clos.print-method-for"
  :short-name "print-method-for")
+
+(ralexandria.prog.proj:new-project
+ #p"./"
+ :name "ralexandria.clos.print-method-for"
+ :short-name "print-method-for")
