@@ -1,10 +1,6 @@
 # ralexandria
 
-Split Alexandria into smaller, independently testable systems organized by theme.
-
-## Todo
-- Add all the functionality from Alexandria.
-- Make an Alexandria package for backwards compatibility, that depends on the independent systems.
+Utilities
 
 ## Validation
 
