@@ -1,4 +1,4 @@
-;;; EXAMPLE
+;;; EXAMPLES
 
 (asdf:load-system :ralexandria.prog.proj)
 
@@ -7,13 +7,17 @@
  :name "ralexandria.clos.tracked-class"
  :short-name "tracked-class")
 
-;;; ANOTHER ONE
 (ralexandria.prog.proj:new-project
  #p"./"
  :name "ralexandria.clos.print-method-for"
  :short-name "print-method-for")
 
 (ralexandria.prog.proj:new-project
- #p"./"
- :name "ralexandria.clos.print-method-for"
- :short-name "print-method-for")
+ "./alexandria/alexandria-2/"
+ :name "alexandria-2.arrays"
+ :short-name "arrays"
+ :depends-on '(#:alexandria-packages)
+ :test-dir t
+ :interface-package nil
+ ;; :local-nicknames '() 
+ )

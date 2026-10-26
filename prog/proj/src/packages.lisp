@@ -3,7 +3,18 @@
   (:export #:new-project
            #:NAME
            #:SHORT-NAME
-           #:DEPENDS-ON))
+           #:DEPENDS-ON
+           #:LOCAL-NICKNAMES
+           #:MAKE-DEPENDS-ON
+           #:MAKE-LOCAL-NICKNAMES
+           #:MAKE-LOCAL-NICKNAME
+           #:NICKNAME
+           #:PACKAGE-NAME
+           #:LOCAL-NICKNAMES-DEFAULT-VALUE-P
+           #:LOCAL-NICKNAMES-STRING
+           #:INTERFACE-PACKAGE
+           #:TEST-DIR
+           #:LOAD-PACKAGES))
 
 (defpackage #:ralexandria.prog.proj-impl
   (:use :cl)
